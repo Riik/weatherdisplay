@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weather Station</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Weather Data</h1>
+  <canvas id="tempChart"></canvas>
+
+  <script>
+    async function fetchData() {
+      // For example, get last 24 hours
+      // Or pass start/end times, e.g. "/api/measurements?start=...&end=..."
+      const res = await fetch('/api/measurements');
+      const data = await res.json();
+      return data;
+    }
+
+    function renderChart(data) {
+      const ctx = document.getElementById('tempChart').getContext('2d');
+      const timestamps = data.map(d => d.timestamp);
+      const temps = data.map(d => d.temperature);
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timestamps,
+          datasets: [{
+            label: 'Temperature',
+            data: temps,
+            borderColor: 'red',
+            fill: false
+          }]
+        }
+      });
+    }
+
+    fetchData().then(renderChart);
+  </script>
+</body>
+</html>
