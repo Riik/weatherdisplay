@@ -4,7 +4,7 @@ import datetime
 
 app = Flask(__name__)
 
-DB_PATH = '/Users/rikvandervlist/git/personal/weatherhat-python/measurements.db'
+DB_PATH = '/home/aart/measurements/measurements.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
