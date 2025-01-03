@@ -4,7 +4,7 @@ import datetime
 
 app = Flask(__name__)
 
-DB_PATH = '/Users/rikvandervlist/git/personal/weatherhat-python/examples/measurements.db'
+DB_PATH = '/Users/rikvandervlist/git/personal/weatherhat-python/measurements.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -25,7 +25,7 @@ def get_measurements():
     conn = get_db_connection()
     c = conn.cursor()
 
-    query = "SELECT * FROM measurements"
+    query = "SELECT * FROM measurements ORDER BY timestamp DESC LIMIT 10000"
     params = []
 
     if start and end:

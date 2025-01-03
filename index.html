@@ -1,42 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Weather Station</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Zwaluw 16 weerstation 🌡️</title>
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+
+    header {
+      background-color: #007acc;
+      color: white;
+      padding: 20px 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    header p {
+      margin: 5px 0 0 0;
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+
+    #weatherChart {
+      margin: 30px auto;
+      width: 90%;
+      height: 1400px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
 <body>
-  <h1>Weather Data</h1>
-  <canvas id="tempChart"></canvas>
+  <center>
+  <h1>Zwaluw 16 weerstation 🌡️</h1>
+</center>
+  <div id="weatherChart""></div>
 
   <script>
     async function fetchData() {
-      // For example, get last 24 hours
-      // Or pass start/end times, e.g. "/api/measurements?start=...&end=..."
       const res = await fetch('/api/measurements');
       const data = await res.json();
       return data;
     }
 
-    function renderChart(data) {
-      const ctx = document.getElementById('tempChart').getContext('2d');
-      const timestamps = data.map(d => d.timestamp);
-      const temps = data.map(d => d.temperature);
+    function createSubplotsChart(data) {
+      const timestamps = data.map(d => new Date(d.timestamp));
 
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: timestamps,
-          datasets: [{
-            label: 'Temperature',
-            data: temps,
-            borderColor: 'red',
-            fill: false
-          }]
-        }
-      });
+      // Each trace is assigned to a different subplot (row)
+      const temperatureTrace = {
+        x: timestamps,
+        y: data.map(d => d.temperature),
+        mode: 'lines',
+        name: 'Temperature (C)',
+        xaxis: 'x',
+        yaxis: 'y'
+      };
+
+      const humidityTrace = {
+        x: timestamps,
+        y: data.map(d => d.humidity),
+        mode: 'lines',
+        name: 'Humidity (%)',
+        xaxis: 'x',
+        yaxis: 'y2'
+      };
+
+      const pressureTrace = {
+        x: timestamps,
+        y: data.map(d => d.pressure),
+        mode: 'lines',
+        name: 'Pressure (hPa)',
+        xaxis: 'x',
+        yaxis: 'y3'
+      };
+
+      const luxTrace = {
+        x: timestamps,
+        y: data.map(d => d.lux),
+        mode: 'lines',
+        name: 'Lux',
+        xaxis: 'x',
+        yaxis: 'y4'
+      };
+
+      const windDirectionTrace = {
+        x: timestamps,
+        y: data.map(d => d.wind_direction),
+        mode: 'lines',
+        name: 'Wind direction (degrees)',
+        xaxis: 'x',
+        yaxis: 'y5'
+      };
+
+      const windSpeedTrace = {
+        x: timestamps,
+        y: data.map(d => d.wind_speed),
+        mode: 'lines',
+        name: 'Wind speed (km/h)',
+        xaxis: 'x',
+        yaxis: 'y6'
+      };
+
+      const rainfallTrace = {
+        x: timestamps,
+        y: data.map(d => d.rainfall_mm),
+        mode: 'lines',
+        name: 'Rainfall (mm)',
+        xaxis: 'x',
+        yaxis: 'y7'
+      };
+
+      const layout = {
+        grid: {
+          rows: 7,
+          columns: 1,
+          subplots: [['xy'], ['xy2'], ['xy3'], ['xy4'], ['xy5'], ['xy6'], ['xy7']],
+          roworder: 'top to bottom'
+        },
+        yaxis:  { title: 'Temperature (C)' },
+        yaxis2: { title: 'Humidity (%)' },
+        yaxis3: { title: 'Pressure (hPa)' },
+        yaxis4: { title: 'Lux' },
+        yaxis5: { title: 'Wind direction (degrees)' },
+        yaxis6: { title: 'Wind speed (km/h)' },
+        yaxis7: { title: 'Rainfall (mm)' },
+        xaxis:  { type: 'date' },
+        height: 1400,
+        showlegend: false
+      };
+
+      Plotly.newPlot(
+        'weatherChart',
+        [temperatureTrace, humidityTrace, pressureTrace, luxTrace, windDirectionTrace, windSpeedTrace, rainfallTrace],
+        layout,
+        { scrollZoom: true }
+      );
     }
 
-    fetchData().then(renderChart);
+    fetchData().then(data => {
+      createSubplotsChart(data);
+    });
   </script>
 </body>
 </html>
