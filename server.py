@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request, send_from_directory
 import sqlite3
-import datetime
+import os
 
 app = Flask(__name__)
 
 DB_PATH = '/home/aart/measurements/measurements.db'
+if "DEBUG_WEATHER_DB" in os.environ:
+    DB_PATH = os.environ["DEBUG_WEATHER_DB"]
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -13,12 +15,10 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    # Serve an index.html with your JavaScript for graphs
     return send_from_directory('', 'index.html')
 
 @app.route('/api/measurements', methods=['GET'])
 def get_measurements():
-    # You can accept query parameters, e.g. ?start=2025-01-01&end=2025-01-02
     start = request.args.get('start')
     end = request.args.get('end')
 
